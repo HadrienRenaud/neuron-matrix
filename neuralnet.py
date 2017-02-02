@@ -1,4 +1,4 @@
-"""Python script file, for NeuralNetwork class.
+"""Python module for NeuralNetwork class.
 
 Author : Hadrien Renaud-Lebret
 Created on 29/01/2016

@@ -6,7 +6,8 @@ Created on 29/01/2016
 
 import numpy as np
 
-# ******************************************* Functions ********************************************
+
+# ******************************************* Functions ******************
 
 
 def inv_cosh(x):
@@ -28,11 +29,15 @@ def deri_iso_fonction(fonction, mu=1, x0=0):
     return fonction_bis
 
 
-def learning_progress_display(succes, compt, dist):
+def learning_progress_display(**args):
     """Display the progress of the learning algorithm."""
-    print("Progress : succes {:^7} | compt : {:^7} | dist : {:f}".format(succes, compt, dist))
+    formats = {'succes': "{:^7}", 'compt': "{:^7}", 'dist': "{:f}", 'av_dist': "{:f}"}
+    print("Progress : ", end="")
+    for arg_name, value in sorted(args.items()):
+        print(arg_name, formats[arg_name].format(value), end=' | ')
+    print()
 
-# ************************************** NeuralNetwork Class ***************************************
+# ************************************** NeuralNetwork Class *************
 
 
 class NeuralNetwork:
@@ -83,7 +88,8 @@ class NeuralNetwork:
 
         input values as an iterable of numeric values between 0 and 1.
         """
-        self.process_archives[0] = 2 * np.array(input_values)[np.newaxis] - 1  # isometry to [-1, 1]
+        self.process_archives[0] = 2 * \
+            np.array(input_values)[np.newaxis] - 1  # isometry to [-1, 1]
         for i in range(len(self.transition_matrix)):
             self.process_archives[i + 1] = self.function(
                 np.dot(self.process_archives[i], self.transition_matrix[i]),)
@@ -123,12 +129,17 @@ class NeuralNetwork:
                 np.dot(self.process_archives[i].transpose(), errors[i + 1])
 
     def learn(self, sample, results, limit_repet=50, max_distance=0.25):
-        """Learning algorithm on the given examples."""
+        """Learning algorithm on the given examples.
+
+        First algorithm.
+        """
         print("NeuralNetwork.learn : begining of the learning algorithm.")
+
         succes = 0
         compt = 0
         i = 0
         dist = float("infinity")
+
         while succes < len(sample) and compt < limit_repet * len(sample):
             self.apply(sample[i])
             dist = self.dist(results[i])
@@ -136,7 +147,7 @@ class NeuralNetwork:
                 self.retropropagation(results[i])
                 compt += 1
                 if compt % 100 == 0:
-                    learning_progress_display(succes, compt, dist)
+                    learning_progress_display(succes=succes, compt=compt, dist=dist)
                 succes = 0
                 self.apply(sample[i])
                 dist = self.dist(results[i])
@@ -144,9 +155,49 @@ class NeuralNetwork:
                 succes += 1
             i = (i + 1) % len(sample)
 
-        learning_progress_display(succes, compt, dist)
+        learning_progress_display(succes=succes, compt=compt, dist=dist)
         print("NeuralNetwork.learn : end of the learning algorithm.")
         return dist
+
+    def learn2(self, sample, results, limit_repet=50, max_distance=0.25):
+        """Learning algorithm on the given examples.
+
+        Method given by Hélène Milhem here :
+        https://moodle.insa-toulouse.fr/file.php/457/ReseauNeurones.pdf
+        """
+        print("NeuralNetwork.learn2 : begining of the learning algorithm.")
+        compt = 0  # number of iterations
+
+        # average distance on the sample processing
+        av_dist = 0
+        for i in range(len(sample)):
+            self.apply(sample[i])
+            av_dist += self.dist(results[i])
+
+        indexes = np.array(range(len(sample)))
+
+        while av_dist > max_distance and compt < limit_repet * len(sample):
+
+            # learningù
+            np.random.shuffle(indexes)
+            for i in indexes:
+                self.apply(sample[i])
+                self.retropropagation(results[i])
+
+            # distance processing
+            av_dist = 0
+            for i in range(len(sample)):
+                self.apply(sample[i])
+                av_dist += self.dist(results[i])
+            av_dist = av_dist / len(sample)
+
+            # display
+            compt += 1
+            if compt % (limit_repet / 100) == 0:
+                learning_progress_display(compt=compt, av_dist=av_dist)
+
+        print("NeuralNetwork.learn2 : end of the learning algorithm.")
+        return av_dist
 
     def to_json(self):
         """Return an expression of the NeuralNetwork in json."""

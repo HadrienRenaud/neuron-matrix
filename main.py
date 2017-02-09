@@ -13,7 +13,6 @@ import argparse
 import fileio as fio
 from neuralnet import NeuralNetwork
 
-
 # *********************************** Data ************************************
 # Data :
 
@@ -24,7 +23,7 @@ alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,?;.:!
 length_alphabet = 8
 
 
-# ******************************************** Argparse ********************************************
+# ******************************************** Argparse ******************
 
 def argparsor():
     """Return the parser for the programm."""
@@ -41,6 +40,9 @@ def argparsor():
 
     parser_learn = sub_parsers.add_parser("learn")
     parser_learn.set_defaults(func=arg_learn)
+    parser_learn.add_argument("--learning_algorithm", help='learning_algorithm',
+                              choices=['default', 'learn', 'learn2', '2'],
+                              type=str, default='default')
 
     return parser
 
@@ -52,21 +54,26 @@ def create_arg_default_function(parser):
     return print_usage_bis
 
 
-def arg_learn(directory, alphabet):
+def arg_learn(args):
     """Action to execute on argument learn."""
     neur = NeuralNetwork("400:150:50:" + str(length_alphabet))
     neur.randomize_factors()
-    print(fio.learn_on_folder(neur, learning_sample_folder, alphabet, limit_repet=250))
+
+    # alphabet treatment
+    if alphabet in args:
+        alph = args.alphabet
+    elif length_alphabet in args:
+        alph = alphabet[:args.length_alphabet]
+    else:
+        alph = alphabet[:length_alphabet]
+
+    print(fio.learn_on_folder(neur, args.learning_directory, alph,
+                              learning_algo=args.learning_algorithm, limit_repet=250))
 
 
-# **************************************** Excecutable code ****************************************
+# **************************************** Excecutable code **************
 # Excecutable code :
 
 if __name__ == '__main__':
     args = argparsor().parse_args()
-    if alphabet in args:
-        args.func(args.learning_directory, args.alphabet)
-    elif length_alphabet in args:
-        args.func(args.learning_directory, alphabet[:args.length_alphabet])
-    else:
-        args.func(args.learning_directory, alphabet[:length_alphabet])
+    args.func(args)

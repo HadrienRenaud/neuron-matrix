@@ -4,10 +4,27 @@ Author : Hadrien Renaud-Lebret
 Created on 29/01/2016
 """
 
+# ******************************* Imports *******************************
+
 import numpy as np
 
+# ******************************** Data ********************************
 
-# ******************************************* Functions ******************
+
+alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,?;.:!éàè'()+-\"="
+
+default_values = {
+    'length_alphabet': 26,
+    'learning_factor': 0.1,
+    'momentum': 0.5,
+    'maximal_distance': 0.2,
+    'limit_iterations': 50,
+    'learning_sample_folder': 'LearningSample',
+    'testing_sample_folder': 'TestingSample',
+}
+
+
+# ****************************** Functions ******************************
 
 
 def inv_cosh(x):
@@ -43,10 +60,8 @@ def learning_progress_display(**args):
 class NeuralNetwork:
     """NeuralNetwork class."""
 
-    learning_factor = 0.1
-
-    def __init__(self, geometry,
-                 function=np.tanh, function_derivate=inv_cosh, logistic_function_param=(1, 0)):
+    def __init__(self, geometry, function=np.tanh, function_derivate=inv_cosh,
+                 logistic_function_param=(1, 0), learning_factor=0.1, momentum=0):
         """Initialisation of the NeuralNetwork.
 
         The geometry argument is as string describing the format of the NeuralNetwork:
@@ -55,6 +70,8 @@ class NeuralNetwork:
         function and function_derivate have to be "vecotrized".
         """
         self.geometry = list(map(int, geometry.split(':')))
+        self.learning_factor = learning_factor
+        self.momentum = momentum
         self.function = iso_fonction(function,
                                      mu=logistic_function_param[0],
                                      x0=logistic_function_param[1])
@@ -65,9 +82,12 @@ class NeuralNetwork:
         # Initialisation of transition_matrix and process_archives
         self.process_archives = [np.zeros(self.geometry[0])]
         self.transition_matrix = []
+        self.transition_matrix_diff = []
         for i in range(1, len(self.geometry)):
             self.process_archives.append(np.zeros(self.geometry[i]))
             self.transition_matrix.append(np.zeros((self.geometry[i - 1], self.geometry[i])))
+            self.transition_matrix_diff.append(
+                np.zeros((self.geometry[i - 1], self.geometry[i])))
 
     def set_transition_matrix(self, matrixes):
         """Set the transition_matrix to the correct values."""
@@ -124,9 +144,11 @@ class NeuralNetwork:
                 np.dot(errors[i + 1], self.transition_matrix[i].transpose())
 
         # update of the transition_matrix
-        for i, mat in enumerate(self.transition_matrix):
-            mat += self.learning_factor * \
-                np.dot(self.process_archives[i].transpose(), errors[i + 1])
+        for i, mat in enumerate(self.transition_matrix_diff):
+            mat = self.learning_factor * (1 - self.momentum) * \
+                np.dot(self.process_archives[i].transpose(), errors[i + 1]) + \
+                self.momentum * mat
+            self.transition_matrix[i] += mat
 
     def learn(self, sample, results, limit_repet=50, max_distance=0.25):
         """Learning algorithm on the given examples.
@@ -178,7 +200,7 @@ class NeuralNetwork:
 
         while av_dist > max_distance and compt < limit_repet * len(sample):
 
-            # learningù
+            # learning
             np.random.shuffle(indexes)
             for i in indexes:
                 self.apply(sample[i])
@@ -194,7 +216,7 @@ class NeuralNetwork:
             # display
             compt += 1
             if compt % (limit_repet / 100) == 0:
-                learning_progress_display(compt=compt, av_dist=av_dist)
+                learning_progress_display(compt=compt * len(sample), av_dist=av_dist)
 
         print("NeuralNetwork.learn2 : end of the learning algorithm.")
         return av_dist

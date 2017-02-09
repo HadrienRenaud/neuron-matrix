@@ -11,38 +11,51 @@ Created on 28/01/2016
 import argparse
 
 import fileio as fio
-from neuralnet import NeuralNetwork
-
-# *********************************** Data ************************************
-# Data :
-
-learning_sample_folder = 'LearningSample'
-
-alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,?;.:!éàè'()+-\"="
-
-length_alphabet = 8
+# import getdata as gd
+from neuralnet import NeuralNetwork, alphabet, default_values
 
 
 # ******************************************** Argparse ******************
+
 
 def argparsor():
     """Return the parser for the programm."""
     parser = argparse.ArgumentParser(description="Show a deep learning example.")
 
-    parser.add_argument("--learning_directory", default=learning_sample_folder,
+    # general parser
+    parser.add_argument("--learning_directory", default=default_values['learning_sample_folder'],
                         help="Directory in which the samples are given")
     parser.add_argument("--length_alphabet", type=int,
-                        help="Shortcut for alphabet.")
+                        help="Shortcut for alphabet.", default=default_values['length_alphabet'])
     parser.add_argument("--alphabet", help="Alphabet considered.")
+    parser.add_argument('-m', "--momentum", default=default_values['momentum'], type=float)
+    parser.add_argument('-l', "--learning_factor",
+                        default=default_values['learning_factor'], type=float)
 
     sub_parsers = parser.add_subparsers(dest='commands')
     parser.set_defaults(func=create_arg_default_function(parser))
 
-    parser_learn = sub_parsers.add_parser("learn")
+    # parser learn
+    parser_learn = sub_parsers.add_parser("learn", "l")
     parser_learn.set_defaults(func=arg_learn)
-    parser_learn.add_argument("--learning_algorithm", help='learning_algorithm',
+    parser_learn.add_argument('-a', "--learning_algorithm", help='learning_algorithm',
                               choices=['default', 'learn', 'learn2', '2'],
                               type=str, default='default')
+    parser_learn.add_argument('-d', "--maximal_distance",
+                              default=default_values['maximal_distance'], type=float)
+    parser_learn.add_argument('-I', "--limit_iterations",
+                              default=default_values['limit_iterations'], type=int)
+
+    # parser learn test
+    # parser_learntest = sub_parsers.add_parser("learntest", "lt")
+    # parser_learntest.set_defaults(func=arg_learn_test)
+    # parser_learntest.add_argument('-a', "--learning_algorithm", help='learning_algorithm',
+    #                               choices=['default', 'learn', 'learn2', '2'],
+    #                               type=str, default='default')
+    # parser_learntest.add_argument('-d', "--maximal_distance",
+    #                               default=default_values['maximal_distance'], type=float)
+    # parser_learntest.add_argument('-I', "--limit_iterations",
+    #                               default=default_values['limit_iterations'], type=int)
 
     return parser
 
@@ -56,20 +69,49 @@ def create_arg_default_function(parser):
 
 def arg_learn(args):
     """Action to execute on argument learn."""
-    neur = NeuralNetwork("400:150:50:" + str(length_alphabet))
+    # alphabet treatment
+    if args.alphabet:
+        alph = args.alphabet
+    else:
+        alph = alphabet[:args.length_alphabet]
+    print(args, args.length_alphabet)
+
+    print("alphabet", alphabet[:args.length_alphabet], alph)
+
+    # creation of a neural network
+    neur = NeuralNetwork("400:150:50:" + str(len(alph)),
+                         learning_factor=args.learning_factor,
+                         momentum=args.momentum,)
     neur.randomize_factors()
 
-    # alphabet treatment
-    if alphabet in args:
-        alph = args.alphabet
-    elif length_alphabet in args:
-        alph = alphabet[:args.length_alphabet]
-    else:
-        alph = alphabet[:length_alphabet]
-
     print(fio.learn_on_folder(neur, args.learning_directory, alph,
-                              learning_algo=args.learning_algorithm, limit_repet=250))
+                              learning_algo=args.learning_algorithm,
+                              limit_repet=args.limit_iterations,
+                              max_distance=args.maximal_distance))
 
+
+# def arg_learn_test(args):
+#    """Action to execute on argument learntest."""
+#    # alphabet treatment
+#    if args.alphabet:
+#        alph = args.alphabet
+#    else:
+#        alph = alphabet[:args.length_alphabet]
+#    print(args, args.length_alphabet)
+#
+#    print("alphabet", alphabet[:args.length_alphabet], alph)
+#
+#    # creation of a neural network
+#    neur = NeuralNetwork("400:150:50:" + str(len(alph)),
+#                         learning_factor=args.learning_factor,
+#                         momentum=args.momentum,)
+#    neur.randomize_factors()
+#
+#    print(fio.learn_on_folder(neur, args.learning_directory, alph,
+#                              learning_algo=args.learning_algorithm,
+#                              limit_repet=args.limit_iterations,
+#                              max_distance=args.maximal_distance))
+#
 
 # **************************************** Excecutable code **************
 # Excecutable code :

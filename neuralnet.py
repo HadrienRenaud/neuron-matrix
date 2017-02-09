@@ -20,7 +20,7 @@ default_values = {
     'maximal_distance': 0.2,
     'limit_iterations': 50,
     'learning_sample_folder': 'LearningSample',
-    'testing_sample_folder': 'TestingSample',
+    'testing_sample_folder': 'TestSample',
 }
 
 
@@ -48,7 +48,7 @@ def deri_iso_fonction(fonction, mu=1, x0=0):
 
 def learning_progress_display(**args):
     """Display the progress of the learning algorithm."""
-    formats = {'succes': "{:^7}", 'compt': "{:^7}", 'dist': "{:f}", 'av_dist': "{:f}"}
+    formats = {'succes': "{:^7}", 'compt': "{:^7}", 'dist': "{:8.4f}", 'av_dist': "{:8.4f}"}
     print("Progress : ", end="")
     for arg_name, value in sorted(args.items()):
         print(arg_name, formats[arg_name].format(value), end=' | ')
@@ -113,6 +113,7 @@ class NeuralNetwork:
         for i in range(len(self.transition_matrix)):
             self.process_archives[i + 1] = self.function(
                 np.dot(self.process_archives[i], self.transition_matrix[i]),)
+        return 0.5 + 0.5 * self.process_archives[-1]  # isometry to [0, 1]
 
     def __call__(self, input_values):
         """Apply the Neural Network to the input values.
@@ -150,7 +151,7 @@ class NeuralNetwork:
                 self.momentum * mat
             self.transition_matrix[i] += mat
 
-    def learn(self, sample, results, limit_repet=50, max_distance=0.25):
+    def learn(self, sample, results, limit_iterations=50, maximal_distance=0.25):
         """Learning algorithm on the given examples.
 
         First algorithm.
@@ -162,10 +163,10 @@ class NeuralNetwork:
         i = 0
         dist = float("infinity")
 
-        while succes < len(sample) and compt < limit_repet * len(sample):
+        while succes < len(sample) and compt < limit_iterations * len(sample):
             self.apply(sample[i])
             dist = self.dist(results[i])
-            while dist > max_distance and compt < limit_repet * len(sample):
+            while dist > maximal_distance and compt < limit_iterations * len(sample):
                 self.retropropagation(results[i])
                 compt += 1
                 if compt % 100 == 0:
@@ -181,7 +182,7 @@ class NeuralNetwork:
         print("NeuralNetwork.learn : end of the learning algorithm.")
         return dist
 
-    def learn2(self, sample, results, limit_repet=50, max_distance=0.25):
+    def learn2(self, sample, results, limit_iterations=50, maximal_distance=0.25):
         """Learning algorithm on the given examples.
 
         Method given by Hélène Milhem here :
@@ -198,7 +199,7 @@ class NeuralNetwork:
 
         indexes = np.array(range(len(sample)))
 
-        while av_dist > max_distance and compt < limit_repet * len(sample):
+        while av_dist > maximal_distance and compt < limit_iterations * len(sample):
 
             # learning
             np.random.shuffle(indexes)
@@ -215,9 +216,10 @@ class NeuralNetwork:
 
             # display
             compt += 1
-            if compt % (limit_repet / 100) == 0:
+            if compt % (limit_iterations / 100) == 0:
                 learning_progress_display(compt=compt * len(sample), av_dist=av_dist)
 
+        learning_progress_display(compt=compt * len(sample), av_dist=av_dist)
         print("NeuralNetwork.learn2 : end of the learning algorithm.")
         return av_dist
 

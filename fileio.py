@@ -19,7 +19,6 @@ import numpy as np
 # ******************************** Functions **********************************
 # Functions :
 
-
 def is_convertible_to_float(string):
     """Function that determine if a string can be safely convert to a float."""
     try:
@@ -86,13 +85,26 @@ def learn_on_folder(neurnet, directory, alphabet, learning_algo="default", **arg
         examples[i] = ex.reshape((1, ex.size))[0, :]
     return learning_algo_function(examples, results, **args)
 
-#
-# def test_on_folder(neurnet, directory, alphabet, **args):
-#     """Make neurnet test every example in the directory."""
-#     examples, results = find_examples(directory, alphabet)
-#     for i, ex in enumerate(examples):
-#         examples[i] = ex.reshape((1, ex.size))[0, :]
-#
+
+def test_on_folder(neurnet, directory, alphabet, **args):
+    """Make neurnet test every example in the directory."""
+    examples, results = find_examples(directory, alphabet)
+    av_dist = 0
+    succes = 0
+    for i, ex in enumerate(examples):
+        ex = ex.reshape((1, ex.size))[0, :]
+        out = neurnet.apply(ex)
+        av_dist += neurnet.dist(results[i])
+        letter_out, max_weigh = max(enumerate(out[0, ]), key=lambda x: x[1])
+        letter_expected = max(enumerate(results[i]), key=lambda x: x[1])[0]
+        if letter_out == letter_expected:
+            succes += 1
+    if examples:
+        return av_dist / len(examples), succes / len(examples)
+    else:
+        return 0, 0
+
+
 # ***************************** Excecutable code ******************************
 # Excecutable code :
 if __name__ == '__main__':

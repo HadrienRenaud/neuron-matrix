@@ -35,7 +35,7 @@ def argparsor():
                         default=default_values['learning_factor'], type=float)
     parser.add_argument('-a', "--learning_algorithm", help='learning_algorithm',
                               choices=['default', 'learn', 'learn2', '2'],
-                              type=str, default='default')
+                              type=str, default=default_values["learning_algorithm"])
     parser.add_argument('-d', "--maximal_distance",
                               default=default_values['maximal_distance'], type=float)
     parser.add_argument('-I', "--limit_iterations",
@@ -118,18 +118,9 @@ def arg_getdata(args):
     else:
         alph = alphabet[:args.length_alphabet]
 
-    dico = {
-        'alphabet': alph,
-        'learning_factor': args.learning_factor,
-        'momentum': args.momentum,
-        'learning_directory': args.learning_directory,
-        'learning_algo': args.learning_algorithm,
-        'limit_iterations': args.limit_iterations,
-        'maximal_distance': args.maximal_distance,
-        'testing_directory': args.testing_directory
-    }
-
-    print(gd.get_data(**dico))
+    print(gd.get_data(alphabet=alph,
+                      learning_directory=args.learning_directory,
+                      testing_directory=args.testing_directory))
 
 
 # **************************************** Excecutable code **************

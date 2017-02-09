@@ -67,7 +67,7 @@ def find_examples(directory, alphabet):
                 results.append(result)
         except OSError as e:
             print("Reading of file {} failed : {}".format(f, e))
-    print("find_examples :", len(examples), "files have been found.")
+    print("find_examples : {} files have been found in {}.".format(len(examples), directory))
     return examples, results
 
 

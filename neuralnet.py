@@ -21,6 +21,7 @@ default_values = {
     'limit_iterations': 50,
     'learning_sample_folder': 'LearningSample',
     'testing_sample_folder': 'TestSample',
+    'learning_algorithm': "default",
 }
 
 

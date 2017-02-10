@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = Neuron-Matrix
 SOURCEDIR     = source
-BUILDDIR      = ../../neuron-matrix-doc
+BUILDDIR      = ../../neuron-matrix-docs
 PDFBUILDDIR   = /tmp
 PDF           = ../manual.pdf
 

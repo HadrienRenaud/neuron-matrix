@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NeuralNetwork module &#8212; Neuron-Matrix 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Processsing Utilitaries" href="addons.html" />
+    <link rel="prev" title="Welcome to Neuron-Matrix’s documentation!" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="addons.html" title="Processsing Utilitaries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Neuron-Matrix’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Neuron-Matrix 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-neuralnet">
+<span id="neuralnetwork-module"></span><h1>NeuralNetwork module<a class="headerlink" href="#module-neuralnet" title="Permalink to this headline">¶</a></h1>
+<p>Python module for NeuralNetwork class.</p>
+<p>It provides an implementation of a NeuralNetwork with utilitaries. It is NOT bounded to learning
+on images or even to learning on samples in different files.</p>
+<dl class="class">
+<dt id="neuralnet.NeuralNetwork">
+<em class="property">class </em><code class="descclassname">neuralnet.</code><code class="descname">NeuralNetwork</code><span class="sig-paren">(</span><em>geometry</em>, <em>function=&lt;ufunc 'tanh'&gt;</em>, <em>function_derivate=&lt;function inv_cosh&gt;</em>, <em>logistic_function_param=(1</em>, <em>0)</em>, <em>learning_factor=0.1</em>, <em>momentum=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>NeuralNetwork class.</p>
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>input_values</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the Neural Network to the input values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Warning:</th><td class="field-body">DOESN&#8217;T SAVE the result for a learning after.
+Use <a class="reference internal" href="#neuralnet.NeuralNetwork.apply" title="neuralnet.NeuralNetwork.apply"><code class="xref py py-func docutils literal"><span class="pre">apply()</span></code></a> in this case.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_values</strong> &#8211; as an iterable of numeric values between 0 and 1.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>geometry</em>, <em>function=&lt;ufunc 'tanh'&gt;</em>, <em>function_derivate=&lt;function inv_cosh&gt;</em>, <em>logistic_function_param=(1</em>, <em>0)</em>, <em>learning_factor=0.1</em>, <em>momentum=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialisation of the NeuralNetwork.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>geometry</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; string describing the format of the NeuralNetwork:
+&#8216;456:12:24:3&#8217; will create a network with a first layer with 456 neurons, a second with
+12, a third with 24 and the last with 3.</li>
+<li><strong>function</strong> &#8211; vectorized function (see <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html#numpy-vectorize">numpy.vectorize</a>)</li>
+<li><strong>function_derivate</strong> &#8211; its (vectorized) function</li>
+<li><strong>logistic_function_param</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; (mu, x0) parameters send to :iso_fonction: and
+:deri_iso_fonction: slope and offset of the logistic function.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.apply">
+<code class="descname">apply</code><span class="sig-paren">(</span><em>input_values</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the NeuralNetwork to the input values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_values</strong> &#8211; as an iterable of numeric values between 0 and 1.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.backpropagation">
+<code class="descname">backpropagation</code><span class="sig-paren">(</span><em>expected_output</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.backpropagation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the backpropagation algorithm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.dist">
+<code class="descname">dist</code><span class="sig-paren">(</span><em>expected_output</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc the distance of the result to the expected_output.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.get_geometry">
+<code class="descname">get_geometry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.get_geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self.geometry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self.geometry modified to render like the one passed as
+an argument of <a class="reference internal" href="#neuralnet.NeuralNetwork.__init__" title="neuralnet.NeuralNetwork.__init__"><code class="xref py py-func docutils literal"><span class="pre">__init__()</span></code></a>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.learn">
+<code class="descname">learn</code><span class="sig-paren">(</span><em>sample</em>, <em>results</em>, <em>limit_iterations=50</em>, <em>maximal_distance=0.25</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.learn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Learning algorithm on the given examples.</p>
+<p>First algorithm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.learn2">
+<code class="descname">learn2</code><span class="sig-paren">(</span><em>sample</em>, <em>results</em>, <em>limit_iterations=50</em>, <em>maximal_distance=0.25</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.learn2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Learning algorithm on the given examples.</p>
+<p>Method given by Hélène Milhem
+<a class="reference external" href="https://moodle.insa-toulouse.fr/file.php/457/ReseauNeurones.pdf">here</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.randomize_factors">
+<code class="descname">randomize_factors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.randomize_factors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomize the transition matrix.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.set_transition_matrix">
+<code class="descname">set_transition_matrix</code><span class="sig-paren">(</span><em>matrixes</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.set_transition_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the transition_matrix to the correct values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.to_json">
+<code class="descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an expression of the NeuralNetwork in json.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="neuralnet.deri_iso_fonction">
+<code class="descclassname">neuralnet.</code><code class="descname">deri_iso_fonction</code><span class="sig-paren">(</span><em>fonction</em>, <em>mu=1</em>, <em>x0=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.deri_iso_fonction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creator of fonctions, linearly translated, for derivative.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neuralnet.inv_cosh">
+<code class="descclassname">neuralnet.</code><code class="descname">inv_cosh</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.inv_cosh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return 1 / cosh(x).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neuralnet.iso_fonction">
+<code class="descclassname">neuralnet.</code><code class="descname">iso_fonction</code><span class="sig-paren">(</span><em>fonction</em>, <em>mu=1</em>, <em>x0=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.iso_fonction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creator of fonctions, linearly translated.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="neuralnet.learning_progress_display">
+<code class="descclassname">neuralnet.</code><code class="descname">learning_progress_display</code><span class="sig-paren">(</span><em>**args</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.learning_progress_display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the progress of the learning algorithm.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="neuralnet.alphabet">
+<code class="descclassname">neuralnet.</code><code class="descname">alphabet</code><a class="headerlink" href="#neuralnet.alphabet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alphabet used. The order is the most important thing. Only the $n$ first values are considered, where $n$ is the length of the alphabet.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="neuralnet.default_values">
+<code class="descclassname">neuralnet.</code><code class="descname">default_values</code><a class="headerlink" href="#neuralnet.default_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Neuron-Matrix&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="addons.html"
+                        title="next chapter">Processsing Utilitaries</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/neuralnet.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="addons.html" title="Processsing Utilitaries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Neuron-Matrix’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Neuron-Matrix 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Hadrien Renaud-Lebret, Guillaume Bressan, Pierre Browne.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

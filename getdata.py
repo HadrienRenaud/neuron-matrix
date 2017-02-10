@@ -1,8 +1,4 @@
-"""Module for neuron-matrix.
-
-Author : Hadrien Renaud-Lebret
-Created on 9/02/2016
-"""
+"""Module for neuron-matrix."""
 
 # ********************************* Imports ***********************************
 # Imports :
@@ -68,10 +64,10 @@ def procedure1(alphabet=alphabet,
     """Function that execute procedure1.
 
     It does:
-     - create a new NeuralNetwork object
-     - randomize its transition_matrix
-     - learn on a given dataset
-     - test on a given dataset
+    - create a new NeuralNetwork object
+    - randomize its transition_matrix
+    - learn on a given dataset
+    - test on a given dataset
     """
     # creation
     neur = NeuralNetwork("400:150:50:" + str(len(alphabet)),

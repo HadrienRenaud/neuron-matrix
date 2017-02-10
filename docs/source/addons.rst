@@ -3,6 +3,10 @@
 Processsing Utilitaries
 =======================
 
+getdata module
+_______________
+
+
 .. automodule:: getdata
     :members:
     :special-members:
@@ -10,12 +14,23 @@ Processsing Utilitaries
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :exclude-members: IteratorMultiple
 
+    .. autoclass:: IteratorMultiple
+      :members:
+      :undoc-members:
+      :inherited-members:
+      :show-inheritance:
+      :private-members:
 
 
 .. data:: default_ranges
 
   Ranges on which it iterate by default.
+
+fileio module
+_____________
+
 
 
 .. automodule:: fileio

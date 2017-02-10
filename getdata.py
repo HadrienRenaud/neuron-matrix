@@ -1,8 +1,4 @@
-"""Module for neuron-matrix.
-
-Author : Hadrien Renaud-Lebret
-Created on 9/02/2016
-"""
+"""Module for neuron-matrix."""
 
 # ********************************* Imports ***********************************
 # Imports :
@@ -68,10 +64,10 @@ def procedure1(alphabet=alphabet,
     """Function that execute procedure1.
 
     It does:
-     - create a new NeuralNetwork object
-     - randomize its transition_matrix
-     - learn on a given dataset
-     - test on a given dataset
+    - create a new NeuralNetwork object
+    - randomize its transition_matrix
+    - learn on a given dataset
+    - test on a given dataset
     """
     # creation
     neur = NeuralNetwork("400:150:50:" + str(len(alphabet)),
@@ -101,12 +97,11 @@ def get_data(proc="1", ranges=default_ranges, **kwargs):
     procs = {'1': procedure1}
     proc = procs[proc]
 
-    print(ranges)
-    print(kwargs)
     ranges_li = sorted(ranges.items())
     ranges_cat = [elt[0] for elt in ranges_li]
-
     results = []
+
+    print("getdata :", ranges_cat)
 
     for li in IteratorMultiple([len(elt[1]) for elt in ranges_li]):
         values = [elt[1][pos] for elt, pos in zip(ranges_li, li)]
@@ -114,7 +109,7 @@ def get_data(proc="1", ranges=default_ranges, **kwargs):
         results.append((li, res))
         print(res)
 
-    print("Done")
+    print("getdata done.")
     return ranges_cat, results
 
 

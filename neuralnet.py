@@ -1,7 +1,7 @@
 """Python module for NeuralNetwork class.
 
-Author : Hadrien Renaud-Lebret
-Created on 29/01/2016
+It provides an implementation of a NeuralNetwork with utilitaries. It is NOT bounded to learning
+on images or even to learning on samples in different files.
 """
 
 # ******************************* Imports *******************************
@@ -65,25 +65,40 @@ class NeuralNetwork:
                  logistic_function_param=(1, 0), learning_factor=0.1, momentum=0):
         """Initialisation of the NeuralNetwork.
 
-        The geometry argument is as string describing the format of the NeuralNetwork:
+        :param str geometry: string describing the format of the NeuralNetwork:
             '456:12:24:3' will create a network with a first layer with 456 neurons, a second with
             12, a third with 24 and the last with 3.
-        function and function_derivate have to be "vecotrized".
+        :param function: vectorized function (see `numpy.vectorize <https://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html#numpy-vectorize>`_)
+        :param function_derivate: its (vectorized) function
+        :param tuple logistic_function_param: (mu, x0) parameters send to :iso_fonction: and
+            :deri_iso_fonction: slope and offset of the logistic function.
         """
+        #: geometry of the NeuralNetwork.
         self.geometry = list(map(int, geometry.split(':')))
+
+        #: learning_factor
         self.learning_factor = learning_factor
+
+        #: inertia factor : between 0 and 1
         self.momentum = momentum
+
+        #: transition function of the NeuralNetwork
         self.function = iso_fonction(function,
                                      mu=logistic_function_param[0],
                                      x0=logistic_function_param[1])
+
+        #: the derivative of the transition function, used in backpropagation
         self.function_derivate = deri_iso_fonction(function_derivate,
                                                    mu=logistic_function_param[0],
                                                    x0=logistic_function_param[1])
 
-        # Initialisation of transition_matrix and process_archives
+        #: process archives, used in backpropagation
         self.process_archives = [np.zeros(self.geometry[0])]
-        self.transition_matrix = []
+        self.transition_matrix = []  #: weight of the neuron transitions
+        #: difference of transitions matrix, used for inertia in backpropagation
         self.transition_matrix_diff = []
+
+        # Initialisation of transition_matrix and process_archives and transition_matrix_diff
         for i in range(1, len(self.geometry)):
             self.process_archives.append(np.zeros(self.geometry[i]))
             self.transition_matrix.append(np.zeros((self.geometry[i - 1], self.geometry[i])))
@@ -96,7 +111,12 @@ class NeuralNetwork:
             self.transition_matrix[i] = np.array(mat)
 
     def get_geometry(self):
-        """Return self.geometry, modified."""
+        """Return self.geometry.
+
+        :return: self.geometry modified to render like the one passed as
+            an argument of :func:`~NeuralNetwork.__init__`.
+        :rtype: str
+        """
         return ':'.join(self.geometry)
 
     def randomize_factors(self):
@@ -107,7 +127,7 @@ class NeuralNetwork:
     def apply(self, input_values):
         """Apply the NeuralNetwork to the input values.
 
-        input values as an iterable of numeric values between 0 and 1.
+        :param input_values: as an iterable of numeric values between 0 and 1.
         """
         self.process_archives[0] = 2 * \
             np.array(input_values)[np.newaxis] - 1  # isometry to [-1, 1]
@@ -119,9 +139,10 @@ class NeuralNetwork:
     def __call__(self, input_values):
         """Apply the Neural Network to the input values.
 
-        DOESN'T SAVE the result for a learning after.
-        Use apply in this case.
-        input values as an iterable of numeric values between 0 and 1.
+        :warning: DOESN'T SAVE the result for a learning after.
+            Use :func:`~NeuralNetwork.apply` in this case.
+
+        :param input_values: as an iterable of numeric values between 0 and 1.
         """
         values = 2 * np.array(input_values)[np.newaxis] - 1  # isometry to [-1 , 1]
         for mat in self.transition_matrix:
@@ -133,14 +154,14 @@ class NeuralNetwork:
         expected_output = np.array(expected_output) * 2 - 1
         return np.sqrt(np.sum((expected_output - self.process_archives[-1])**2))
 
-    def retropropagation(self, expected_output):
-        """Apply the retropropagation algorithm."""
+    def backpropagation(self, expected_output):
+        """Apply the backpropagation algorithm."""
         # Initialisation of the error.
         errors = [np.zeros(out.shape) for out in self.process_archives]
         errors[-1] = self.function_derivate(self.process_archives[-1]) * \
             (2 * np.array(expected_output) - 1 - self.process_archives[-1])
 
-        # retropropagation of the errors
+        # backpropagation of the errors
         for i in range(len(self.transition_matrix) - 1, 0, -1):
             errors[i] = self.function_derivate(self.process_archives[i]) * \
                 np.dot(errors[i + 1], self.transition_matrix[i].transpose())
@@ -168,7 +189,7 @@ class NeuralNetwork:
             self.apply(sample[i])
             dist = self.dist(results[i])
             while dist > maximal_distance and compt < limit_iterations * len(sample):
-                self.retropropagation(results[i])
+                self.backpropagation(results[i])
                 compt += 1
                 if compt % 100 == 0:
                     learning_progress_display(succes=succes, compt=compt, dist=dist)
@@ -186,8 +207,8 @@ class NeuralNetwork:
     def learn2(self, sample, results, limit_iterations=50, maximal_distance=0.25):
         """Learning algorithm on the given examples.
 
-        Method given by Hélène Milhem here :
-        https://moodle.insa-toulouse.fr/file.php/457/ReseauNeurones.pdf
+        Method given by Hélène Milhem
+        `here <https://moodle.insa-toulouse.fr/file.php/457/ReseauNeurones.pdf>`_.
         """
         print("NeuralNetwork.learn2 : begining of the learning algorithm.")
         compt = 0  # number of iterations
@@ -206,7 +227,7 @@ class NeuralNetwork:
             np.random.shuffle(indexes)
             for i in indexes:
                 self.apply(sample[i])
-                self.retropropagation(results[i])
+                self.backpropagation(results[i])
 
             # distance processing
             av_dist = 0

@@ -1,9 +1,6 @@
 """Python module for neuron-matrix.
 
 It implements the main input/output functions used in neuron-matrix.
-
-Author : Hadrien Renaud-Lebret
-Created on 2/02/2016
 """
 
 

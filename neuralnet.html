@@ -134,8 +134,44 @@ Use <a class="reference internal" href="#neuralnet.NeuralNetwork.apply" title="n
 </tr>
 <tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expected_output</strong> (<em>numpy.array</em>) &#8211; expected results</td>
 </tr>
+<tr class="field-odd field"><th class="field-name">Execution:</th><td class="field-body"></td>
+</tr>
 </tbody>
 </table>
+<ul>
+<li><p class="first">computing of the errors :</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>Initialisation at the bottom of the NeuralNetwork</dt>
+<dd><span class="math">\(e_{-1} := f'(x_{-1}) \times (y - x_{-1})\)</span></dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>backpropagation of the gradient</dt>
+<dd><span class="math">\(e_{i-1} := f'(x_{i-1}) \times (e_{i+1} \cdot t_i^T)\)</span></dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">correction of the transition matrix :</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>computing of the differencial matrix:</dt>
+<dd><span class="math">\(\Delta t_i := \tau (1 - \mu) (x_i^T \cdot e_{i+1}) + \mu \Delta t_i\)</span></dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>correcting the transition matrix:</dt>
+<dd><span class="math">\(t_i := t_i + \Delta t_i\)</span></dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
 </dd></dl>
 
 <dl class="method">
@@ -145,7 +181,7 @@ Use <a class="reference internal" href="#neuralnet.NeuralNetwork.apply" title="n
 <p>It computes the distance between the results found in
 <code class="xref py py-data docutils literal"><span class="pre">process_archives</span></code>
 with the formula :
-<span class="math">\(\sqrt{\sum_{i} (y_i - x_i)^2}\)</span></p>
+<span class="math">\(\sqrt{\sum_{i} (y_i - x_{-1, i})^2}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -219,10 +255,12 @@ an argument of <a class="reference internal" href="#neuralnet.NeuralNetwork.__in
 <dt id="neuralnet.deri_iso_fonction">
 <code class="descclassname">neuralnet.</code><code class="descname">deri_iso_fonction</code><span class="sig-paren">(</span><em>fonction</em>, <em>mu=1</em>, <em>x0=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.deri_iso_fonction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creator of fonctions, affinely translated, for derivative.</p>
-<p>Compute a isometric transform of fonction with the formula :</p>
-<p><span class="math">\(\forall x, \mathrm{deri\_iso\_fonction}(f)(x) = \mu \times f(\mu \times x + x_0)\)</span></p>
-<p>Which is equivalent to, if <span class="math">\(f\)</span> is the derivative of <span class="math">\(F\)</span>:</p>
-<p><span class="math">\(\forall x, \mathrm{deri\_iso\_fonction}(f, \mu, x_0)(x) = \frac{d}{dx}(\mathrm{iso\_fonction}(F, \mu, x_0))(x) = \mu \times \frac{dF}{dx}(\mu \times x + x_0) = \mu \times f(\mu \times x + x_0)\)</span></p>
+<dl class="docutils">
+<dt>Compute a isometric transform of fonction with the formula :</dt>
+<dd><span class="math">\(\forall x, \mathrm{deri\_iso\_fonction}(f)(x) = \mu \times f(\mu \times x + x_0)\)</span></dd>
+<dt>Which is equivalent to, if <span class="math">\(f\)</span> is the derivative of <span class="math">\(F\)</span>:</dt>
+<dd><span class="math">\(\forall x, \mathrm{deri\_iso\_fonction}(f, \mu, x_0)(x) = \frac{d}{dx}(\mathrm{iso\_fonction}(F, \mu, x_0))(x) = \mu \times \frac{dF}{dx}(\mu \times x + x_0) = \mu \times f(\mu \times x + x_0)\)</span></dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

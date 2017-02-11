@@ -92,7 +92,7 @@ def test_on_folder(neurnet, directory, alphabet, **args):
         ex = ex.reshape((1, ex.size))[0, :]
         out = neurnet.apply(ex)
         av_dist += neurnet.dist(results[i])
-        letter_out, max_weigh = max(enumerate(out[0, ]), key=lambda x: x[1])
+        letter_out, max_weigh = max(enumerate(out), key=lambda x: x[1])
         letter_expected = max(enumerate(results[i]), key=lambda x: x[1])[0]
         if letter_out == letter_expected:
             succes += 1

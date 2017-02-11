@@ -29,21 +29,47 @@ default_values = {
 
 
 def inv_cosh(x):
-    """Return 1 / cosh(x)."""
+    r"""Return :math:`\frac{1}{\cosh(x)}`."""
     return 1 / np.cosh(x)
 
 
 def iso_fonction(fonction, mu=1, x0=0):
-    """Creator of fonctions, linearly translated."""
+    r"""Creator of fonctions, linearly translated.
+
+    Compute a isometric transform of fonction with the formula :
+    :math:`\forall x, \mathrm{iso\_fonction}(f)(x) = f(\mu \times x + x_0)`
+
+    :param float mu: mutliplicative factor :math:`\mu`
+    :param float x0: additive term :math:`x_0`
+    :param fonction: function taking 1 numeric positionnal argument.
+    :return: :math:`F : x \to f(\mu \times x + x_0)`
+    """
     def fonction_bis(x):
         return fonction(mu * x + x0)
     return fonction_bis
 
 
 def deri_iso_fonction(fonction, mu=1, x0=0):
-    """Creator of fonctions, linearly translated, for derivative."""
+    r"""Creator of fonctions, affinely translated, for derivative.
+
+    Compute a isometric transform of fonction with the formula :
+        :math:`\forall x, \mathrm{deri\_iso\_fonction}(f)(x) = \mu \times f(\mu \times x + x_0)`
+
+    Which is equivalent to, if :math:`f` is the derivative of :math:`F`:
+        :math:`\forall x, \mathrm{deri\_iso\_fonction}(f, \mu, x_0)(x) = \frac{d}{dx}(\mathrm{iso\_fonction}(F, \mu, x_0))(x) = \mu \times \frac{dF}{dx}(\mu \times x + x_0) = \mu \times f(\mu \times x + x_0)`
+
+    :note: return the derivate of :func:`iso_fonction`
+    :param float mu: mutliplicative factor :math:`\mu`
+    :param float x0: additive term :math:`x_0`
+    :param fonction: function taking 1 numeric positionnal argument.
+    :return: :math:`F : x \to \mu \times f(\mu \times x + x_0)`
+    """
     def fonction_bis(x):
         return mu * fonction(mu * x + x0)
+    fonction_bis.__doc__ = fonction.__doc__
+    fonction_bis.__doc__ += """
+     Isometricaly translated with mu = {} and x0 = {}
+     """.format(mu, x0)
     return fonction_bis
 
 
@@ -128,13 +154,14 @@ class NeuralNetwork:
         """Apply the NeuralNetwork to the input values.
 
         :param input_values: as an iterable of numeric values between 0 and 1.
+        :return: an numpy array of values between 0 and 1.
         """
         self.process_archives[0] = 2 * \
             np.array(input_values)[np.newaxis] - 1  # isometry to [-1, 1]
         for i in range(len(self.transition_matrix)):
             self.process_archives[i + 1] = self.function(
                 np.dot(self.process_archives[i], self.transition_matrix[i]),)
-        return 0.5 + 0.5 * self.process_archives[-1]  # isometry to [0, 1]
+        return (0.5 + 0.5 * self.process_archives[-1])[0, ]  # isometry to [0, 1]
 
     def __call__(self, input_values):
         """Apply the Neural Network to the input values.
@@ -143,19 +170,52 @@ class NeuralNetwork:
             Use :func:`~NeuralNetwork.apply` in this case.
 
         :param input_values: as an iterable of numeric values between 0 and 1.
+        :return: an numpy array of values between 0 and 1.
         """
         values = 2 * np.array(input_values)[np.newaxis] - 1  # isometry to [-1 , 1]
         for mat in self.transition_matrix:
             values = self.function(np.dot(values, mat))
-        return 0.5 + 0.5 * values  # isometry to [0, 1]
+        return (0.5 + 0.5 * values)[0, ]  # isometry to [0, 1]
 
     def dist(self, expected_output):
-        """Calc the distance of the result to the expected_output."""
+        r"""Calc the distance of the result to the expected_output.
+
+        It computes the distance between the results found in
+        :data:`~NeuralNetwork.process_archives`
+        with the formula :
+        :math:`\sqrt{\sum_{i} (y_i - x_{-1, i})^2}`
+
+        :param numpy.array expected_output: expected result :math:`(y_i)_i`
+        :note: the distance is not an average distance on the two arrays.
+        :note: compute the `euclidian norm <https://en.wikipedia.org/wiki/Euclidean_distance>`_ of
+            the difference between the two arrays.
+        :return float: :math:`\sqrt{\sum_{i} (y_i - x_i)^2}`
+        """
         expected_output = np.array(expected_output) * 2 - 1
         return np.sqrt(np.sum((expected_output - self.process_archives[-1])**2))
 
     def backpropagation(self, expected_output):
-        """Apply the backpropagation algorithm."""
+        r"""Apply the backpropagation algorithm.
+
+        :note: You have to :func:`~NeuralNetwork.apply` the Network on the sample before.
+        :param numpy.array expected_output: expected results
+
+        :Execution:
+
+        * computing of the errors :
+
+            * Initialisation at the bottom of the NeuralNetwork
+                :math:`e_{-1} := f'(x_{-1}) \times (y - x_{-1})`
+            * backpropagation of the gradient
+                :math:`e_{i-1} := f'(x_{i-1}) \times (e_{i+1} \cdot t_i^T)`
+
+        * correction of the transition matrix :
+
+            * computing of the differencial matrix:
+                :math:`\Delta t_i := \tau (1 - \mu) (x_i^T \cdot e_{i+1}) + \mu \Delta t_i`
+            * correcting the transition matrix:
+                :math:`t_i := t_i + \Delta t_i`
+        """
         # Initialisation of the error.
         errors = [np.zeros(out.shape) for out in self.process_archives]
         errors[-1] = self.function_derivate(self.process_archives[-1]) * \

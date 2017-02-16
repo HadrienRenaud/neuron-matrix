@@ -42,7 +42,7 @@ def read_sample(file_text):
 def save_image(matrix, file_name):
     """Function saving matrix as an image."""
     plt.imshow(matrix, interpolation='nearest', cmap=plt.cm.gray)
-    plt.savefig('test')
+    plt.savefig(file_name)
 
 
 def find_examples(directory, alphabet):

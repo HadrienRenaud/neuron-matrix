@@ -8,6 +8,8 @@ on images or even to learning on samples in different files.
 
 import numpy as np
 
+import functions as fu
+
 # ******************************** Data ********************************
 
 
@@ -25,54 +27,6 @@ default_values = {
 }
 
 
-# ****************************** Functions ******************************
-
-
-def inv_cosh(x):
-    r"""Return :math:`\frac{1}{\cosh(x)}`."""
-    return 1 / np.cosh(x)
-
-
-def iso_fonction(fonction, mu=1, x0=0):
-    r"""Creator of fonctions, linearly translated.
-
-    Compute a isometric transform of fonction with the formula :
-    :math:`\forall x, \mathrm{iso\_fonction}(f)(x) = f(\mu \times x + x_0)`
-
-    :param float mu: mutliplicative factor :math:`\mu`
-    :param float x0: additive term :math:`x_0`
-    :param fonction: function taking 1 numeric positionnal argument.
-    :return: :math:`F : x \to f(\mu \times x + x_0)`
-    """
-    def fonction_bis(x):
-        return fonction(mu * x + x0)
-    return fonction_bis
-
-
-def deri_iso_fonction(fonction, mu=1, x0=0):
-    r"""Creator of fonctions, affinely translated, for derivative.
-
-    Compute a isometric transform of fonction with the formula :
-        :math:`\forall x, \mathrm{deri\_iso\_fonction}(f)(x) = \mu \times f(\mu \times x + x_0)`
-
-    Which is equivalent to, if :math:`f` is the derivative of :math:`F`:
-        :math:`\forall x, \mathrm{deri\_iso\_fonction}(f, \mu, x_0)(x) = \frac{d}{dx}(\mathrm{iso\_fonction}(F, \mu, x_0))(x) = \mu \times \frac{dF}{dx}(\mu \times x + x_0) = \mu \times f(\mu \times x + x_0)`
-
-    :note: return the derivate of :func:`iso_fonction`
-    :param float mu: mutliplicative factor :math:`\mu`
-    :param float x0: additive term :math:`x_0`
-    :param fonction: function taking 1 numeric positionnal argument.
-    :return: :math:`F : x \to \mu \times f(\mu \times x + x_0)`
-    """
-    def fonction_bis(x):
-        return mu * fonction(mu * x + x0)
-    fonction_bis.__doc__ = fonction.__doc__
-    fonction_bis.__doc__ += """
-     Isometricaly translated with mu = {} and x0 = {}
-     """.format(mu, x0)
-    return fonction_bis
-
-
 def learning_progress_display(**args):
     """Display the progress of the learning algorithm."""
     formats = {'succes': "{:^7}", 'compt': "{:^7}", 'dist': "{:8.4f}", 'av_dist': "{:8.4f}"}
@@ -87,36 +41,44 @@ def learning_progress_display(**args):
 class NeuralNetwork:
     """NeuralNetwork class."""
 
-    def __init__(self, geometry, function=np.tanh, function_derivate=inv_cosh,
-                 logistic_function_param=(1, 0), learning_factor=0.1, momentum=0):
+    def __init__(self, geometry, functions=[(np.tanh, fu.inv_cosh)],
+                 learning_factor=0.1, momentum=0):
         """Initialisation of the NeuralNetwork.
 
         :param str geometry: string describing the format of the NeuralNetwork:
             '456:12:24:3' will create a network with a first layer with 456 neurons, a second with
             12, a third with 24 and the last with 3.
-        :param function: vectorized function (see `numpy.vectorize <https://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html#numpy-vectorize>`_)
-        :param function_derivate: its (vectorized) function
+        :param list functions: list of tuple of vectorized functions (see `numpy.vectorize <https://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html`_)
+            [(fun1, deri_fun1), (fun2, deri_fun2), ...]
         :param tuple logistic_function_param: (mu, x0) parameters send to :iso_fonction: and
             :deri_iso_fonction: slope and offset of the logistic function.
         """
+        self.functions_str = str(functions)
+        self.geometry_str = geometry
         #: geometry of the NeuralNetwork.
-        self.geometry = list(map(int, geometry.split(':')))
+        self.geometry = []
+        # transitions functions
+        self.functions = []
+        self.functions_derivate = []
+
+        # processing of the geometry
+        for g in geometry.split(":"):
+            if ',' in g:
+                nb, i_fun = g.split(',')
+                nb = int(nb)
+                self.functions.append(functions[int(i_fun)][0])
+                self.functions_derivate.append(functions[int(i_fun)][1])
+            else:
+                nb = int(g)
+                self.functions.append(functions[0][0])
+                self.functions_derivate.append(functions[0][1])
+            self.geometry.append(nb)
 
         #: learning_factor
         self.learning_factor = learning_factor
 
         #: inertia factor : between 0 and 1
         self.momentum = momentum
-
-        #: transition function of the NeuralNetwork
-        self.function = iso_fonction(function,
-                                     mu=logistic_function_param[0],
-                                     x0=logistic_function_param[1])
-
-        #: the derivative of the transition function, used in backpropagation
-        self.function_derivate = deri_iso_fonction(function_derivate,
-                                                   mu=logistic_function_param[0],
-                                                   x0=logistic_function_param[1])
 
         #: process archives, used in backpropagation
         self.process_archives = [np.zeros(self.geometry[0])]
@@ -143,7 +105,7 @@ class NeuralNetwork:
             an argument of :func:`~NeuralNetwork.__init__`.
         :rtype: str
         """
-        return ':'.join(self.geometry)
+        return ':'.join([self.geometry])
 
     def randomize_factors(self):
         """Randomize the transition matrix."""
@@ -159,9 +121,9 @@ class NeuralNetwork:
         self.process_archives[0] = 2 * \
             np.array(input_values)[np.newaxis] - 1  # isometry to [-1, 1]
         for i in range(len(self.transition_matrix)):
-            self.process_archives[i + 1] = self.function(
+            self.process_archives[i + 1] = self.functions[i](
                 np.dot(self.process_archives[i], self.transition_matrix[i]),)
-        return (0.5 + 0.5 * self.process_archives[-1])[0, ]  # isometry to [0, 1]
+        return self.process_archives[-1][0, ]
 
     def __call__(self, input_values):
         """Apply the Neural Network to the input values.
@@ -173,9 +135,9 @@ class NeuralNetwork:
         :return: an numpy array of values between 0 and 1.
         """
         values = 2 * np.array(input_values)[np.newaxis] - 1  # isometry to [-1 , 1]
-        for mat in self.transition_matrix:
-            values = self.function(np.dot(values, mat))
-        return (0.5 + 0.5 * values)[0, ]  # isometry to [0, 1]
+        for fun, mat in zip(self.functions, self.transition_matrix):
+            values = fun(np.dot(values, mat))
+        return values[0, ]
 
     def dist(self, expected_output):
         r"""Calc the distance of the result to the expected_output.
@@ -218,12 +180,12 @@ class NeuralNetwork:
         """
         # Initialisation of the error.
         errors = [np.zeros(out.shape) for out in self.process_archives]
-        errors[-1] = self.function_derivate(self.process_archives[-1]) * \
+        errors[-1] = self.functions_derivate[-1](self.process_archives[-1]) * \
             (2 * np.array(expected_output) - 1 - self.process_archives[-1])
 
         # backpropagation of the errors
         for i in range(len(self.transition_matrix) - 1, 0, -1):
-            errors[i] = self.function_derivate(self.process_archives[i]) * \
+            errors[i] = self.functions_derivate[i](self.process_archives[i]) * \
                 np.dot(errors[i + 1], self.transition_matrix[i].transpose())
 
         # update of the transition_matrix
@@ -308,6 +270,17 @@ class NeuralNetwork:
     def to_json(self):
         """Return an expression of the NeuralNetwork in json."""
         dico = {}
-        dico['geometry'] = ':'.join(self.geometry)
+        dico['geometry'] = self.geometry_str
         dico['transition_matrix'] = [mat.tolist() for mat in self.transition_matrix]
+        dico['functions'] = str(self.functions_str)
+        dico['momentum'] = self.momentum
+        dico['learning_factor'] = self.learning_factor
         return dico
+
+    def set_learning_factor(self, tau):
+        """Set the learning factor to the value passed as an argument."""
+        self.learning_factor = tau
+
+    def get_learning_factor(self):
+        """Return the learning_factor of the NeuralNetwork."""
+        return self.learning_factor

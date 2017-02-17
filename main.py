@@ -10,7 +10,10 @@ Created on 28/01/2016
 
 import argparse
 
+import numpy as np
+
 import fileio as fio
+import functions as fu
 import getdata as gd
 from neuralnet import NeuralNetwork, alphabet, default_values
 
@@ -75,9 +78,10 @@ def arg_learn(args):
         alph = alphabet[:args.length_alphabet]
 
     # creation of a neural network
-    neur = NeuralNetwork("400:150:50:" + str(len(alph)),
+    neur = NeuralNetwork("400:100:" + str(len(alph)),
                          learning_factor=args.learning_factor,
-                         momentum=args.momentum,)
+                         momentum=args.momentum,
+                         functions=[(fu.ReLU, fu.heaviside), (fu.log_soft_max, fu.one)])
     neur.randomize_factors()
 
     print(fio.learn_on_folder(neur, args.learning_directory, alph,
@@ -95,15 +99,18 @@ def arg_learn_test(args):
         alph = alphabet[:args.length_alphabet]
 
     # creation of a neural network
-    neur = NeuralNetwork("400:150:50:" + str(len(alph)),
+    neur = NeuralNetwork("400:85:" + str(len(alph)),
                          learning_factor=args.learning_factor,
-                         momentum=args.momentum,)
+                         momentum=args.momentum,
+                         functions=[(np.tanh, fu.inv_cosh),
+                                    (fu.log_soft_max, fu.deri_log_soft_max)])
     neur.randomize_factors()
 
-    fio.learn_on_folder(neur, args.learning_directory, alph,
-                        learning_algo=args.learning_algorithm,
-                        limit_iterations=args.limit_iterations,
-                        maximal_distance=args.maximal_distance)
+    res = fio.learn_on_folder(neur, args.learning_directory, alph,
+                              learning_algo=args.learning_algorithm,
+                              limit_iterations=args.limit_iterations,
+                              maximal_distance=args.maximal_distance)
+    print("Learning result :", res)
 
     av_dist, succes = fio.test_on_folder(neur, args.testing_directory, alph)
     print("Test result : {:10.4f} distance on average and {:3.2%} of success on the tests.".format(
@@ -112,7 +119,6 @@ def arg_learn_test(args):
 
 def arg_getdata(args):
     """Action called on getdata."""
-
     if args.alphabet:
         alph = args.alphabet
     else:

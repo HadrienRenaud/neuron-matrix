@@ -49,7 +49,7 @@ class NeuralNetwork:
         :param str geometry: string describing the format of the NeuralNetwork:
             '456:12:24:3' will create a network with a first layer with 456 neurons, a second with
             12, a third with 24 and the last with 3.
-        :param list functions: list of tuple of vectorized functions (see `numpy.vectorize <https://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html`_)
+        :param list functions: list of tuple of vectorized functions (see `numpy.vectorize <https://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html>`_)
             [(fun1, deri_fun1), (fun2, deri_fun2), ...]
         :param tuple logistic_function_param: (mu, x0) parameters send to :iso_fonction: and
             :deri_iso_fonction: slope and offset of the logistic function.

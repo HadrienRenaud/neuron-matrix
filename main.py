@@ -45,7 +45,7 @@ def argparsor():
                               default=default_values['limit_iterations'], type=int)
 
     sub_parsers = parser.add_subparsers(dest='commands')
-    parser.set_defaults(func=create_arg_default_function(parser))
+    parser.set_defaults(func=arg_default)
 
     # parser learn
     parser_learn = sub_parsers.add_parser("learn", aliases=["l"])
@@ -62,11 +62,24 @@ def argparsor():
     return parser
 
 
-def create_arg_default_function(parser):
-    """Create a default function, print usage."""
-    def print_usage_bis(*args, **kwargs):
-        parser.print_usage()
-    return print_usage_bis
+def arg_default(args):
+    """Action to execute by default."""
+    parser = argparsor()
+    print("Enter h for help, q to quit.")
+    while True:
+        inp = input("> ").split()
+        if len(inp) == 0 or inp[0] == '#':
+            pass
+        elif inp[0].upper() in ['H', 'HELP']:
+            parser.print_usage()
+            print("Enter h for help, q to quit.")
+        elif inp[0].upper() in ['Q', 'QUIT', 'EXIT']:
+            break
+        elif inp:
+            if inp[0] == 'main.py':
+                inp = inp[1:]
+            argsb = parser.parse_args(inp)
+            argsb.func(argsb)
 
 
 def arg_learn(args):

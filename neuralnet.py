@@ -29,7 +29,8 @@ default_values = {
 
 def learning_progress_display(**args):
     """Display the progress of the learning algorithm."""
-    formats = {'succes': "{:^7}", 'compt': "{:^7}", 'dist': "{:8.4f}", 'av_dist': "{:8.4f}"}
+    formats = {'succes': "{:^7}", 'compt': "{:^7}",
+               'iterations': "{:^5}", 'dist': "{:8.4f}", 'av_dist': "{:8.8f}"}
     print("Progress : ", end="")
     for arg_name, value in sorted(args.items()):
         print(arg_name, formats[arg_name].format(value), end=' | ')
@@ -195,7 +196,8 @@ class NeuralNetwork:
                 self.momentum * mat
             self.transition_matrix[i] += mat
 
-    def learn(self, sample, results, limit_iterations=50, maximal_distance=0.25):
+    def learn(self, sample, results, limit_iterations=default_values['limit_iterations'],
+              maximal_distance=default_values['maximal_distance']):
         """Learning algorithm on the given examples.
 
         First algorithm.
@@ -226,14 +228,15 @@ class NeuralNetwork:
         print("NeuralNetwork.learn : end of the learning algorithm.")
         return dist
 
-    def learn2(self, sample, results, limit_iterations=50, maximal_distance=0.25):
+    def learn2(self, sample, results, limit_iterations=default_values['limit_iterations'],
+               maximal_distance=default_values['maximal_distance']):
         """Learning algorithm on the given examples.
 
         Method given by Hélène Milhem
         `here <https://moodle.insa-toulouse.fr/file.php/457/ReseauNeurones.pdf>`_.
         """
         print("NeuralNetwork.learn2 : begining of the learning algorithm.")
-        compt = 0  # number of iterations
+        iterations = 0  # number of iterations
 
         # average distance on the sample processing
         av_dist = 0
@@ -243,7 +246,7 @@ class NeuralNetwork:
 
         indexes = np.array(range(len(sample)))
 
-        while av_dist > maximal_distance and compt < limit_iterations * len(sample):
+        while av_dist > maximal_distance and iterations < limit_iterations:
 
             # learning
             np.random.shuffle(indexes)
@@ -259,11 +262,11 @@ class NeuralNetwork:
             av_dist = av_dist / len(sample)
 
             # display
-            compt += 1
-            if compt % (limit_iterations / 100) == 0:
-                learning_progress_display(compt=compt * len(sample), av_dist=av_dist)
+            iterations += 1
+            if iterations % (limit_iterations / 100) == 0:
+                learning_progress_display(iterations=iterations, av_dist=av_dist)
 
-        learning_progress_display(compt=compt * len(sample), av_dist=av_dist)
+        learning_progress_display(iterations=iterations * len(sample), av_dist=av_dist)
         print("NeuralNetwork.learn2 : end of the learning algorithm.")
         return av_dist
 

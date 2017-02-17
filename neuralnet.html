@@ -62,7 +62,7 @@
 on images or even to learning on samples in different files.</p>
 <dl class="class">
 <dt id="neuralnet.NeuralNetwork">
-<em class="property">class </em><code class="descclassname">neuralnet.</code><code class="descname">NeuralNetwork</code><span class="sig-paren">(</span><em>geometry</em>, <em>function=&lt;ufunc 'tanh'&gt;</em>, <em>function_derivate=&lt;function inv_cosh&gt;</em>, <em>logistic_function_param=(1</em>, <em>0)</em>, <em>learning_factor=0.1</em>, <em>momentum=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">neuralnet.</code><code class="descname">NeuralNetwork</code><span class="sig-paren">(</span><em>geometry, functions=[(&lt;ufunc 'tanh'&gt;, &lt;function inv_cosh&gt;)], learning_factor=0.1, momentum=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
 <dd><p>NeuralNetwork class.</p>
 <dl class="method">
 <dt id="neuralnet.NeuralNetwork.__call__">
@@ -85,7 +85,7 @@ Use <a class="reference internal" href="#neuralnet.NeuralNetwork.apply" title="n
 
 <dl class="method">
 <dt id="neuralnet.NeuralNetwork.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>geometry</em>, <em>function=&lt;ufunc 'tanh'&gt;</em>, <em>function_derivate=&lt;function inv_cosh&gt;</em>, <em>logistic_function_param=(1</em>, <em>0)</em>, <em>learning_factor=0.1</em>, <em>momentum=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>geometry, functions=[(&lt;ufunc 'tanh'&gt;, &lt;function inv_cosh&gt;)], learning_factor=0.1, momentum=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialisation of the NeuralNetwork.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -95,8 +95,8 @@ Use <a class="reference internal" href="#neuralnet.NeuralNetwork.apply" title="n
 <li><strong>geometry</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; string describing the format of the NeuralNetwork:
 &#8216;456:12:24:3&#8217; will create a network with a first layer with 456 neurons, a second with
 12, a third with 24 and the last with 3.</li>
-<li><strong>function</strong> &#8211; vectorized function (see <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html#numpy-vectorize">numpy.vectorize</a>)</li>
-<li><strong>function_derivate</strong> &#8211; its (vectorized) function</li>
+<li><strong>functions</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; list of tuple of vectorized functions (see <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.vectorize.html">numpy.vectorize</a>)
+[(fun1, deri_fun1), (fun2, deri_fun2), ...]</li>
 <li><strong>logistic_function_param</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; (mu, x0) parameters send to :iso_fonction: and
 :deri_iso_fonction: slope and offset of the logistic function.</li>
 </ul>
@@ -217,15 +217,21 @@ an argument of <a class="reference internal" href="#neuralnet.NeuralNetwork.__in
 </dd></dl>
 
 <dl class="method">
+<dt id="neuralnet.NeuralNetwork.get_learning_factor">
+<code class="descname">get_learning_factor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.get_learning_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the learning_factor of the NeuralNetwork.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="neuralnet.NeuralNetwork.learn">
-<code class="descname">learn</code><span class="sig-paren">(</span><em>sample</em>, <em>results</em>, <em>limit_iterations=50</em>, <em>maximal_distance=0.25</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.learn" title="Permalink to this definition">¶</a></dt>
+<code class="descname">learn</code><span class="sig-paren">(</span><em>sample</em>, <em>results</em>, <em>limit_iterations=50</em>, <em>maximal_distance=0.2</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.learn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Learning algorithm on the given examples.</p>
 <p>First algorithm.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="neuralnet.NeuralNetwork.learn2">
-<code class="descname">learn2</code><span class="sig-paren">(</span><em>sample</em>, <em>results</em>, <em>limit_iterations=50</em>, <em>maximal_distance=0.25</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.learn2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">learn2</code><span class="sig-paren">(</span><em>sample</em>, <em>results</em>, <em>limit_iterations=50</em>, <em>maximal_distance=0.2</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.learn2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Learning algorithm on the given examples.</p>
 <p>Method given by Hélène Milhem
 <a class="reference external" href="https://moodle.insa-toulouse.fr/file.php/457/ReseauNeurones.pdf">here</a>.</p>
@@ -235,6 +241,12 @@ an argument of <a class="reference internal" href="#neuralnet.NeuralNetwork.__in
 <dt id="neuralnet.NeuralNetwork.randomize_factors">
 <code class="descname">randomize_factors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.randomize_factors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomize the transition matrix.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="neuralnet.NeuralNetwork.set_learning_factor">
+<code class="descname">set_learning_factor</code><span class="sig-paren">(</span><em>tau</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.NeuralNetwork.set_learning_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the learning factor to the value passed as an argument.</p>
 </dd></dl>
 
 <dl class="method">
@@ -249,67 +261,6 @@ an argument of <a class="reference internal" href="#neuralnet.NeuralNetwork.__in
 <dd><p>Return an expression of the NeuralNetwork in json.</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="function">
-<dt id="neuralnet.deri_iso_fonction">
-<code class="descclassname">neuralnet.</code><code class="descname">deri_iso_fonction</code><span class="sig-paren">(</span><em>fonction</em>, <em>mu=1</em>, <em>x0=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.deri_iso_fonction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creator of fonctions, affinely translated, for derivative.</p>
-<dl class="docutils">
-<dt>Compute a isometric transform of fonction with the formula :</dt>
-<dd><span class="math">\(\forall x, \mathrm{deri\_iso\_fonction}(f)(x) = \mu \times f(\mu \times x + x_0)\)</span></dd>
-<dt>Which is equivalent to, if <span class="math">\(f\)</span> is the derivative of <span class="math">\(F\)</span>:</dt>
-<dd><span class="math">\(\forall x, \mathrm{deri\_iso\_fonction}(f, \mu, x_0)(x) = \frac{d}{dx}(\mathrm{iso\_fonction}(F, \mu, x_0))(x) = \mu \times \frac{dF}{dx}(\mu \times x + x_0) = \mu \times f(\mu \times x + x_0)\)</span></dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body"><p class="first">return the derivate of <a class="reference internal" href="#neuralnet.iso_fonction" title="neuralnet.iso_fonction"><code class="xref py py-func docutils literal"><span class="pre">iso_fonction()</span></code></a></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; mutliplicative factor <span class="math">\(\mu\)</span></li>
-<li><strong>x0</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; additive term <span class="math">\(x_0\)</span></li>
-<li><strong>fonction</strong> &#8211; function taking 1 numeric positionnal argument.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><span class="math">\(F : x \to \mu \times f(\mu \times x + x_0)\)</span></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="neuralnet.inv_cosh">
-<code class="descclassname">neuralnet.</code><code class="descname">inv_cosh</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.inv_cosh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return <span class="math">\(\frac{1}{\cosh(x)}\)</span>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="neuralnet.iso_fonction">
-<code class="descclassname">neuralnet.</code><code class="descname">iso_fonction</code><span class="sig-paren">(</span><em>fonction</em>, <em>mu=1</em>, <em>x0=0</em><span class="sig-paren">)</span><a class="headerlink" href="#neuralnet.iso_fonction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creator of fonctions, linearly translated.</p>
-<p>Compute a isometric transform of fonction with the formula :
-<span class="math">\(\forall x, \mathrm{iso\_fonction}(f)(x) = f(\mu \times x + x_0)\)</span></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; mutliplicative factor <span class="math">\(\mu\)</span></li>
-<li><strong>x0</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; additive term <span class="math">\(x_0\)</span></li>
-<li><strong>fonction</strong> &#8211; function taking 1 numeric positionnal argument.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><span class="math">\(F : x \to f(\mu \times x + x_0)\)</span></p>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="function">
